@@ -4,9 +4,11 @@
 #define button1_id 1
 #define button2_id 2
 
-HWND hMainWnd;
+HWND hwnd;
 HWND button1;
 HWND button2;
+
+RECT rct;
 
 int masButtonPos[] = { 370, 330 };
 
@@ -41,7 +43,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     }
 
     // Функция, создающая окно   
-    hMainWnd = CreateWindow(L"Window", L"Окно",
+    hwnd = CreateWindow(L"Window", L"Окно",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL, 
         CW_USEDEFAULT, NULL, 640, 480,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
@@ -49,21 +51,21 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     button1 = CreateWindow( L"BUTTON", L"Да",
         WS_CHILD | WS_VISIBLE,
         170, 330, 100, 50,
-        hMainWnd, (HMENU)button1_id, hThisInstance, NULL);
+        hwnd, (HMENU)button1_id, hThisInstance, NULL);
 
     button2 = CreateWindow( L"BUTTON", L"Нет",
         WS_CHILD | WS_VISIBLE,
         masButtonPos[0], masButtonPos[1], 100, 50,
-        hMainWnd, (HMENU)button2_id, hThisInstance, NULL);
+        hwnd, (HMENU)button2_id, hThisInstance, NULL);
 
     // Проверка коррректности создания окна
-    if (!hMainWnd) {
+    if (!hwnd) {
         MessageBox(NULL, L"Не получилось создать окно!", L"Ошибка", MB_OK);
         return NULL;
     }
 
-    ShowWindow(hMainWnd, nCmdShow);
-    UpdateWindow(hMainWnd);
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
 
     while (GetMessage(&msg, NULL, NULL, NULL)) 
     {
@@ -82,15 +84,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg) 
     {
     case WM_CREATE:
-        
+        GetClientRect(hwnd, &rct);
         return 0;
 
     case WM_PAINT:
-        UpdateWindow(hMainWnd);
+        UpdateWindow(hwnd);
         break;
 
-    case WM_LBUTTONDOWN:
-        
+    case WM_SIZE:
+        GetClientRect(hwnd, &rct);
         break;
 
     case WM_MOUSEMOVE:
