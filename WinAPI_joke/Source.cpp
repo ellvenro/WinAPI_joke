@@ -118,32 +118,54 @@ void MoveButton(int xPos, int yPos)
     int x = masButtonPos[0] + 50;
     int y = masButtonPos[1] + 25;
 
-    if (xPos >= masButtonPos[0] - 20 
-        && xPos <= masButtonPos[0] + 100 + 20
-        && yPos >= masButtonPos[1] - 20 
-        && yPos <= masButtonPos[1] + 50 + 20)
+    //if (xPos >= masButtonPos[0] - 20 
+    //    && xPos <= masButtonPos[0] + 100 + 20
+    //    && yPos >= masButtonPos[1] - 20 
+    //    && yPos <= masButtonPos[1] + 50 + 20)
+    //{
+    //    int speed = 4;
+    //    int dx = x - xPos;
+    //    int dy = y - yPos;
+    //    float dxy = sqrt(dx * dx + dy * dy);
+    //    int kdx = speed * abs(dx) % (int)dxy;
+    //    int kdy = speed * abs(dy) % (int)dxy;
+
+    //    //кнопка от мышки
+    //    masButtonPos[0] = (dx <= 0) ? masButtonPos[0] - kdx: masButtonPos[0] + kdx;
+    //    masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;
+
+    //    //кнопка за мышкой
+    //    /*masButtonPos[0] = (dx <= 0) ? masButtonPos[0] + kdx : masButtonPos[0] - kdx;
+    //    masButtonPos[1] = (dy <= 0) ? masButtonPos[1] + kdy : masButtonPos[1] - kdy;*/        
+    //}
+
+    if (xPos > masButtonPos[0] && xPos < masButtonPos[0] + 100 && yPos > masButtonPos[1] && yPos < masButtonPos[1] + 50 ||
+        masButtonPos[0] < 0 || masButtonPos[1] < 0 || masButtonPos[0] > rct.right || masButtonPos[1] > rct.bottom)
     {
-        int speed = 4;
-        int dx = x - xPos;
-        int dy = y - yPos;
-        float dxy = sqrt(dx * dx + dy * dy);
-        int kdx = speed * abs(dx) % (int)dxy;
-        int kdy = speed * abs(dy) % (int)dxy;
+        float maxDistance = 0;
+        int xSign = 1, ySign = 1;
+        int dx, dy, dxy;
 
-        //кнопка от мышки
-        masButtonPos[0] = (dx <= 0) ? masButtonPos[0] - kdx: masButtonPos[0] + kdx;
-        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;
+        dx = rct.right - x;
+        if (x > dx)
+        {
+            dx = x;
+            xSign = -1;
+        }
 
-        //кнопка за мышкой
-        /*masButtonPos[0] = (dx <= 0) ? masButtonPos[0] + kdx : masButtonPos[0] - kdx;
-        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] + kdy : masButtonPos[1] - kdy;*/        
-    }
+        dy = rct.bottom - y;
+        if (y > rct.bottom - y)
+        {
+            dy = y;
+            xSign = -1;
+        }
 
-    if (xPos > masButtonPos[0]
-        && xPos < masButtonPos[0] + 100
-        && yPos > masButtonPos[1]
-        && yPos < masButtonPos[1] + 50)
-    {
+        int pos1 = xSign * (rand() % dx);
+        masButtonPos[0] = masButtonPos[0] + pos1;
+
+        pos1 = ySign * (rand() % dy);
+        masButtonPos[1] = masButtonPos[1] + pos1;
+
 
     }
     
