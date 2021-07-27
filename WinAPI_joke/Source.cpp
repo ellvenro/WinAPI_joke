@@ -1,6 +1,9 @@
 #include <windows.h> 
 #include <math.h>
 
+#define speedButton 50
+#define hitButton 10
+
 #define button1_id 1
 #define button2_id 2
 #define caption1_id 3
@@ -11,10 +14,9 @@ HWND button2;
 HWND caption1;
 
 RECT rct;
+HINSTANCE hThisInstance;
 
 int masButtonPos[] = { 350, 150 };
-
-HINSTANCE hThisInstance;
 
 void MoveButton(int xPos, int yPos);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -38,7 +40,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wc.hInstance = hInst;
     
-    // Проверка существования класса
     if (!RegisterClassEx(&wc)) {
         MessageBox(NULL, L"Не получилось зарегистрировать класс!", L"Ошибка", MB_OK);
         return NULL; 
@@ -54,28 +55,33 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         return NULL;
     }
 
-    HFONT hf;
-    hf = CreateFont(20, 0, 0, 0, FW_NORMAL, TRUE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
-        DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, NULL);
-    
-    HFONT hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+    ShowScrollBar(hwnd, SB_BOTH, false);
+
+    HFONT hFontButton = CreateFont(20, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
+        DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
+        DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
+
+    HFONT hFontCaption = CreateFont(30, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
+        DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
+        DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
    
     button1 = CreateWindow( L"BUTTON", L"Да",
         WS_CHILD | WS_VISIBLE,
         masButtonPos[0] - 200, masButtonPos[1], 100, 50,
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
-    SendMessage(button1, WM_SETFONT, WPARAM(hf), 0);
+    SendMessage(button1, WM_SETFONT, (WPARAM)hFontButton, 0);
 
     caption1 = CreateWindow(L"STATIC", L"Ты не сможешь выбрать \"Нет\"",
-        WS_CHILD | WS_VISIBLE,
+        WS_CHILD | WS_VISIBLE | ES_CENTER | SS_CENTERIMAGE,
         10, 10, 580, 130,
         hwnd, (HMENU)caption1_id, hThisInstance, NULL);
+    SendMessage(caption1, WM_SETFONT, (WPARAM)hFontCaption, 0);
 
     button2 = CreateWindow(L"BUTTON", L"Нет",
         WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
         masButtonPos[0], masButtonPos[1], 100, 50,
         hwnd, (HMENU)button2_id, hThisInstance, NULL);
-    SendMessage(button2, WM_SETFONT, (WPARAM)hFont, TRUE);
+    SendMessage(button2, WM_SETFONT, (WPARAM)hFontButton, TRUE);
    
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
@@ -87,14 +93,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         ScreenToClient(hwnd, pPnt);
         MoveButton(pPnt[0].x, pPnt[0].y);
         MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
-        /*SetCapture(hwnd);*/
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
     free(pPnt);
     return msg.wParam;
 }
-
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
@@ -106,6 +110,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     switch (uMsg) 
     {
+    case WM_CTLCOLORSTATIC:
+    {
+        HDC hdcStatic = (HDC)wParam;
+        SetBkColor(hdcStatic, RGB(255, 255, 255));
+        return (INT_PTR)CreateSolidBrush(RGB(255, 255, 255));
+    }
+
     case WM_CREATE:
         GetClientRect(hwnd, &rct);
         return 0;
@@ -128,19 +139,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         if (wParam == button2_id)
         {
-            
-            /*MoveButton(masButtonPos[0], masButtonPos[1]);
-            MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);*/
+            MoveButton(masButtonPos[0], masButtonPos[1]);
+            MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
         }
+
         if (wParam == button1_id)
         {
             SendMessage(button2, WM_CLOSE, 0, 0);
             DestroyWindow(button2);
+            UpdateWindow(hwnd);
             SetWindowTextA(caption1, "Ну вот");
         }
         break;
-
-        
 
     default:
         return DefWindowProc(hWnd, uMsg, wParam, lParam); 
@@ -155,22 +165,16 @@ void MoveButton(int xPos, int yPos)
     int x = masButtonPos[0] + 50;
     int y = masButtonPos[1] + 25;
 
-    if (abs(xPos - x) <= 50 + 10 && abs(yPos - y) <= 25 + 10)
+    if (abs(xPos - x) <= 50 + hitButton && abs(yPos - y) <= 25 + hitButton)
     {
-        int speed = 4;
         int dx = x - xPos;
         int dy = y - yPos;
         float dxy = sqrt(dx * dx + dy * dy);
-        int kdx = speed * abs(dx) % (int)dxy;
-        int kdy = speed * abs(dy) % (int)dxy;
+        int kdx = speedButton * abs(dx) % (int)dxy;
+        int kdy = speedButton * abs(dy) % (int)dxy;
 
-        //кнопка от мышки
         masButtonPos[0] = (dx <= 0) ? masButtonPos[0] - kdx: masButtonPos[0] + kdx;
-        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;
-
-        //кнопка за мышкой
-        /*masButtonPos[0] = (dx <= 0) ? masButtonPos[0] + kdx : masButtonPos[0] - kdx;
-        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] + kdy : masButtonPos[1] - kdy;*/        
+        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;      
     }
 
     if (masButtonPos[0] < 0 || masButtonPos[1] < 0 || masButtonPos[0] + 100 > rct.right || masButtonPos[1] + 50 > rct.bottom)
