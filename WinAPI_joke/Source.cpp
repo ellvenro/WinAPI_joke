@@ -3,10 +3,12 @@
 
 #define button1_id 1
 #define button2_id 2
+#define caption1_id 3
 
 HWND hwnd;
 HWND button1;
 HWND button2;
+HWND caption1;
 
 RECT rct;
 
@@ -42,54 +44,65 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         return NULL; 
     }
 
-    // Функция, создающая окно   
     hwnd = CreateWindow(L"Window", L"Опрос",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL, 
         CW_USEDEFAULT, NULL, 600, 300,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
     
-    
+    if (!hwnd) {
+        MessageBox(NULL, L"Не получилось создать окно!", L"Ошибка", MB_OK);
+        return NULL;
+    }
+
     HFONT hf;
     hf = CreateFont(20, 0, 0, 0, FW_NORMAL, TRUE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, NULL);
     
     HFONT hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-    
-
+   
     button1 = CreateWindow( L"BUTTON", L"Да",
         WS_CHILD | WS_VISIBLE,
         masButtonPos[0] - 200, masButtonPos[1], 100, 50,
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
     SendMessage(button1, WM_SETFONT, WPARAM(hf), 0);
 
-    button2 = CreateWindow( L"BUTTON", L"Нет",
+    caption1 = CreateWindow(L"STATIC", L"Ты не сможешь выбрать \"Нет\"",
         WS_CHILD | WS_VISIBLE,
+        10, 10, 580, 130,
+        hwnd, (HMENU)caption1_id, hThisInstance, NULL);
+
+    button2 = CreateWindow(L"BUTTON", L"Нет",
+        WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
         masButtonPos[0], masButtonPos[1], 100, 50,
         hwnd, (HMENU)button2_id, hThisInstance, NULL);
     SendMessage(button2, WM_SETFONT, (WPARAM)hFont, TRUE);
-
-    // Проверка коррректности создания окна
-    if (!hwnd) {
-        MessageBox(NULL, L"Не получилось создать окно!", L"Ошибка", MB_OK);
-        return NULL;
-    }
-
+   
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
+    LPPOINT pPnt = (LPPOINT)malloc(sizeof(*pPnt));
     while (GetMessage(&msg, NULL, NULL, NULL)) 
     {
+        GetCursorPos(pPnt);
+        ScreenToClient(hwnd, pPnt);
+        MoveButton(pPnt[0].x, pPnt[0].y);
+        MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
+        /*SetCapture(hwnd);*/
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-
+    free(pPnt);
     return msg.wParam;
 }
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
     int xPos;
     int yPos;
+
+    int x;
+    int y;
 
     switch (uMsg) 
     {
@@ -106,12 +119,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_MOUSEMOVE:
-        xPos = LOWORD(lParam);
-        yPos = HIWORD(lParam);
-        MoveButton(xPos, yPos);
-        MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
         break;
-    
+
     case WM_DESTROY:
         PostQuitMessage(NULL); 
         break;
@@ -119,10 +128,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         if (wParam == button2_id)
         {
-            MoveButton(masButtonPos[0], masButtonPos[1]);
-            MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
+            
+            /*MoveButton(masButtonPos[0], masButtonPos[1]);
+            MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);*/
+        }
+        if (wParam == button1_id)
+        {
+            SendMessage(button2, WM_CLOSE, 0, 0);
+            DestroyWindow(button2);
+            SetWindowTextA(caption1, "Ну вот");
         }
         break;
+
+        
 
     default:
         return DefWindowProc(hWnd, uMsg, wParam, lParam); 
@@ -133,6 +151,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void MoveButton(int xPos, int yPos)
 {
+
     int x = masButtonPos[0] + 50;
     int y = masButtonPos[1] + 25;
 
@@ -161,6 +180,7 @@ void MoveButton(int xPos, int yPos)
         int dx, dy, dxy;
 
         dx = abs(rct.right - x);
+
         if (abs(x) > dx)
         {
             dx = abs(x);
