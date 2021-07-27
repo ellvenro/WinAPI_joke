@@ -1,8 +1,11 @@
 #include <windows.h> 
 #include <math.h>
 
-#define speedButton 50
-#define hitButton 10
+#define speedButton 50                      // Скорость кнопки
+#define hitButton 10                        // Количество пикселей, на которое мышь может наезжать на кнопку
+#define coloreBackground RGB(0, 0, 0)
+#define coloreText RGB(255, 255, 255)
+#define nVisible 230                        // Прозрачность
 
 #define button1_id 1
 #define button2_id 2
@@ -33,7 +36,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
 
     WNDCLASSEX wc;
     wc.cbSize = sizeof(wc);
-    wc.style = CS_HREDRAW | CS_VREDRAW /*| CS_NOCLOSE*/;
+    wc.style = CS_HREDRAW | CS_VREDRAW ;
     wc.lpfnWndProc = WndProc;
     wc.lpszMenuName = NULL;
     wc.lpszClassName = L"Window";
@@ -42,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
     wc.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wc.hbrBackground = (HBRUSH)CreateSolidBrush(coloreBackground);;
     wc.hInstance = hInst;
     
     if (!RegisterClassEx(&wc)) {
@@ -50,7 +53,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         return NULL; 
     }
 
-    hwnd = CreateWindow(L"Window", L"Опрос",
+    hwnd = CreateWindowEx(WS_EX_LAYERED, L"Window", L"Опрос",
+        WS_OVERLAPPEDWINDOW | WS_VSCROLL,
+        CW_USEDEFAULT, NULL, 600, 300,
+        (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
+    SetLayeredWindowAttributes(hwnd, 0, nVisible, LWA_ALPHA);
+
+    /*hwnd = CreateWindow(L"Window", L"Опрос",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL, 
         CW_USEDEFAULT, NULL, 600, 300,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
@@ -58,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     if (!hwnd) {
         MessageBox(NULL, L"Не получилось создать окно!", L"Ошибка", MB_OK);
         return NULL;
-    }
+    }*/
 
     ShowScrollBar(hwnd, SB_BOTH, false);
 
@@ -76,11 +85,17 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
     SendMessage(button1, WM_SETFONT, (WPARAM)hFontButton, 0);
 
-    caption1 = CreateWindow(L"STATIC", L"Ты не сможешь выбрать \"Нет\"",
+    caption1 = CreateWindow(L"STATIC", L"Ты идиот?", //Ты не сможешь выбрать \"Нет\"
         WS_CHILD | WS_VISIBLE | ES_CENTER | SS_CENTERIMAGE,
-        10, 10, 580, 130,
+        10, 10, 563, 130,
         hwnd, (HMENU)caption1_id, hThisInstance, NULL);
     SendMessage(caption1, WM_SETFONT, (WPARAM)hFontCaption, 0);
+    //SetTextColor(GetDC(caption1), coloreText);
+    //SetBkColor(GetDC(caption1), coloreBackground);
+    //UpdateWindow(caption1);
+    //CreateSolidBrush(RGB(0, 0, 0));
+    //SendMessage(hwnd, WM_CTLCOLORSTATIC, (WPARAM)caption1, 0);
+    SendMessage(caption1, WM_CTLCOLORSTATIC, (WPARAM)caption1, (LPARAM)GetDlgItem(hwnd, caption1_id));
 
     button2 = CreateWindow(L"BUTTON", L"Нет",
         WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
@@ -113,8 +128,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_CTLCOLORSTATIC:
     {
         HDC hdcStatic = (HDC)wParam;
-        SetBkColor(hdcStatic, RGB(255, 255, 255));
-        return (INT_PTR)CreateSolidBrush(RGB(255, 255, 255));
+        SetTextColor(hdcStatic, coloreText);
+        SetBkColor(hdcStatic, coloreBackground);
+        return (INT_PTR)CreateSolidBrush(coloreBackground);
     }
 
     case WM_CREATE:
@@ -147,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             SetWindowTextA(caption1, "Справедливо, теперь можно и выйти");
             button3 = CreateWindow(L"BUTTON", L"Выход",
                 WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
-                masButtonPos[0] - 100, masButtonPos[1], 100, 50,
+                250, 150, 100, 50,
                 hwnd, (HMENU)button3_id, hThisInstance, NULL);
             SendMessage(button3, WM_SETFONT, (WPARAM)hFontButton, TRUE);
         }
