@@ -10,7 +10,7 @@ HWND button2;
 
 RECT rct;
 
-int masButtonPos[] = { 370, 330 };
+int masButtonPos[] = { 350, 150 };
 
 HINSTANCE hThisInstance;
 
@@ -24,7 +24,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
 
     WNDCLASSEX wc;
     wc.cbSize = sizeof(wc);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.style = CS_HREDRAW | CS_VREDRAW /*| CS_NOCLOSE*/;
     wc.lpfnWndProc = WndProc;
     wc.lpszMenuName = NULL;
     wc.lpszClassName = L"Window";
@@ -43,9 +43,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     }
 
     // Функция, создающая окно   
-    hwnd = CreateWindow(L"Window", L"Окно",
+    hwnd = CreateWindow(L"Window", L"Опрос",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL, 
-        CW_USEDEFAULT, NULL, 640, 480,
+        CW_USEDEFAULT, NULL, 600, 300,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
     
     button1 = CreateWindow( L"BUTTON", L"Да",
@@ -106,6 +106,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(NULL); 
         break;
     
+    case WM_COMMAND:
+        if (wParam == button2_id)
+        {
+            MoveButton(masButtonPos[0], masButtonPos[1]);
+            MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
+        }
+        break;
+
     default:
         return DefWindowProc(hWnd, uMsg, wParam, lParam); 
     }
@@ -118,7 +126,7 @@ void MoveButton(int xPos, int yPos)
     int x = masButtonPos[0] + 50;
     int y = masButtonPos[1] + 25;
 
-    if (abs(xPos - x) <= 50 + 20 && abs(yPos - y) <= 25 + 20)
+    if (abs(xPos - x) <= 50 + 10 && abs(yPos - y) <= 25 + 10)
     {
         int speed = 4;
         int dx = x - xPos;
