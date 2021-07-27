@@ -48,15 +48,25 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         CW_USEDEFAULT, NULL, 600, 300,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
     
+    
+    HFONT hf;
+    hf = CreateFont(20, 0, 0, 0, FW_NORMAL, TRUE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
+        DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, NULL);
+    
+    HFONT hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+    
+
     button1 = CreateWindow( L"BUTTON", L"Да",
         WS_CHILD | WS_VISIBLE,
         masButtonPos[0] - 200, masButtonPos[1], 100, 50,
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
+    SendMessage(button1, WM_SETFONT, WPARAM(hf), 0);
 
     button2 = CreateWindow( L"BUTTON", L"Нет",
         WS_CHILD | WS_VISIBLE,
         masButtonPos[0], masButtonPos[1], 100, 50,
         hwnd, (HMENU)button2_id, hThisInstance, NULL);
+    SendMessage(button2, WM_SETFONT, (WPARAM)hFont, TRUE);
 
     // Проверка коррректности создания окна
     if (!hwnd) {
