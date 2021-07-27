@@ -6,12 +6,17 @@
 
 #define button1_id 1
 #define button2_id 2
-#define caption1_id 3
+#define button3_id 3
+#define caption1_id 4
 
 HWND hwnd;
 HWND button1;
 HWND button2;
+HWND button3;
 HWND caption1;
+
+HFONT hFontButton;
+HFONT hFontCaption;
 
 RECT rct;
 HINSTANCE hThisInstance;
@@ -57,11 +62,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
 
     ShowScrollBar(hwnd, SB_BOTH, false);
 
-    HFONT hFontButton = CreateFont(20, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
+    hFontButton = CreateFont(20, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
         DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
 
-    HFONT hFontCaption = CreateFont(30, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
+    hFontCaption = CreateFont(30, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
         DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
    
@@ -102,14 +107,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
-    int xPos;
-    int yPos;
-
-    int x;
-    int y;
-
     switch (uMsg) 
     {
+
     case WM_CTLCOLORSTATIC:
     {
         HDC hdcStatic = (HDC)wParam;
@@ -121,6 +121,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         GetClientRect(hwnd, &rct);
         return 0;
 
+    case WM_DESTROY:
+        PostQuitMessage(NULL);
+        break;
+
+    case WM_CLOSE:
+        break;
+
     case WM_PAINT:
         UpdateWindow(hwnd);
         break;
@@ -129,26 +136,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         GetClientRect(hwnd, &rct);
         break;
 
-    case WM_MOUSEMOVE:
-        break;
-
-    case WM_DESTROY:
-        PostQuitMessage(NULL); 
-        break;
-    
     case WM_COMMAND:
+        if (wParam == button1_id)
+        {
+            SendMessage(button1, WM_CLOSE, 0, 0);
+            DestroyWindow(button1);
+            SendMessage(button2, WM_CLOSE, 0, 0);
+            DestroyWindow(button2);
+            UpdateWindow(hwnd);
+            SetWindowTextA(caption1, "Справедливо, теперь можно и выйти");
+            button3 = CreateWindow(L"BUTTON", L"Выход",
+                WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
+                masButtonPos[0] - 100, masButtonPos[1], 100, 50,
+                hwnd, (HMENU)button3_id, hThisInstance, NULL);
+            SendMessage(button3, WM_SETFONT, (WPARAM)hFontButton, TRUE);
+        }
+
         if (wParam == button2_id)
         {
             MoveButton(masButtonPos[0], masButtonPos[1]);
             MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
         }
 
-        if (wParam == button1_id)
+        if (wParam == button3_id)
         {
-            SendMessage(button2, WM_CLOSE, 0, 0);
-            DestroyWindow(button2);
-            UpdateWindow(hwnd);
-            SetWindowTextA(caption1, "Ну вот");
+            PostQuitMessage(NULL);
         }
         break;
 
