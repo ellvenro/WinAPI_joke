@@ -50,7 +50,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     
     button1 = CreateWindow( L"BUTTON", L"Да",
         WS_CHILD | WS_VISIBLE,
-        170, 330, 100, 50,
+        masButtonPos[0] - 200, masButtonPos[1], 100, 50,
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
 
     button2 = CreateWindow( L"BUTTON", L"Нет",
@@ -118,55 +118,46 @@ void MoveButton(int xPos, int yPos)
     int x = masButtonPos[0] + 50;
     int y = masButtonPos[1] + 25;
 
-    //if (xPos >= masButtonPos[0] - 20 
-    //    && xPos <= masButtonPos[0] + 100 + 20
-    //    && yPos >= masButtonPos[1] - 20 
-    //    && yPos <= masButtonPos[1] + 50 + 20)
-    //{
-    //    int speed = 4;
-    //    int dx = x - xPos;
-    //    int dy = y - yPos;
-    //    float dxy = sqrt(dx * dx + dy * dy);
-    //    int kdx = speed * abs(dx) % (int)dxy;
-    //    int kdy = speed * abs(dy) % (int)dxy;
+    if (abs(xPos - x) <= 50 + 20 && abs(yPos - y) <= 25 + 20)
+    {
+        int speed = 4;
+        int dx = x - xPos;
+        int dy = y - yPos;
+        float dxy = sqrt(dx * dx + dy * dy);
+        int kdx = speed * abs(dx) % (int)dxy;
+        int kdy = speed * abs(dy) % (int)dxy;
 
-    //    //кнопка от мышки
-    //    masButtonPos[0] = (dx <= 0) ? masButtonPos[0] - kdx: masButtonPos[0] + kdx;
-    //    masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;
+        //кнопка от мышки
+        masButtonPos[0] = (dx <= 0) ? masButtonPos[0] - kdx: masButtonPos[0] + kdx;
+        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;
 
-    //    //кнопка за мышкой
-    //    /*masButtonPos[0] = (dx <= 0) ? masButtonPos[0] + kdx : masButtonPos[0] - kdx;
-    //    masButtonPos[1] = (dy <= 0) ? masButtonPos[1] + kdy : masButtonPos[1] - kdy;*/        
-    //}
+        //кнопка за мышкой
+        /*masButtonPos[0] = (dx <= 0) ? masButtonPos[0] + kdx : masButtonPos[0] - kdx;
+        masButtonPos[1] = (dy <= 0) ? masButtonPos[1] + kdy : masButtonPos[1] - kdy;*/        
+    }
 
-    if (xPos > masButtonPos[0] && xPos < masButtonPos[0] + 100 && yPos > masButtonPos[1] && yPos < masButtonPos[1] + 50 ||
-        masButtonPos[0] < 0 || masButtonPos[1] < 0 || masButtonPos[0] > rct.right || masButtonPos[1] > rct.bottom)
+    if (masButtonPos[0] < 0 || masButtonPos[1] < 0 || masButtonPos[0] + 100 > rct.right || masButtonPos[1] + 50 > rct.bottom)
     {
         float maxDistance = 0;
         int xSign = 1, ySign = 1;
         int dx, dy, dxy;
 
-        dx = rct.right - x;
-        if (x > dx)
+        dx = abs(rct.right - x);
+        if (abs(x) > dx)
         {
-            dx = x;
+            dx = abs(x);
             xSign = -1;
         }
 
-        dy = rct.bottom - y;
-        if (y > rct.bottom - y)
+        dy = abs(rct.bottom - y);
+        if (abs(y) > dy)
         {
-            dy = y;
+            dy = abs(y);
             xSign = -1;
         }
 
-        int pos1 = xSign * (rand() % dx);
-        masButtonPos[0] = masButtonPos[0] + pos1;
-
-        pos1 = ySign * (rand() % dy);
-        masButtonPos[1] = masButtonPos[1] + pos1;
-
-
+        masButtonPos[0] = masButtonPos[0] + xSign * (dx / 2);
+        masButtonPos[1] = masButtonPos[1] + ySign * (dy / 2);
     }
     
 }
