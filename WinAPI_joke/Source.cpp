@@ -1,11 +1,11 @@
-#include <windows.h> 
+п»ї#include <windows.h> 
 #include <math.h>
 
-#define speedButton 50                      // Скорость кнопки
-#define hitButton 10                        // Количество пикселей, на которое мышь может наезжать на кнопку
+#define speedButton 50                      // РЎРєРѕСЂРѕСЃС‚СЊ РєРЅРѕРїРєРё
+#define hitButton 10                        // РљРѕР»РёС‡РµСЃС‚РІРѕ РїРёРєСЃРµР»РµР№, РЅР° РєРѕС‚РѕСЂРѕРµ РјС‹С€СЊ РјРѕР¶РµС‚ РЅР°РµР·Р¶Р°С‚СЊ РЅР° РєРЅРѕРїРєСѓ
 #define coloreBackground RGB(0, 0, 0)
 #define coloreText RGB(255, 255, 255)
-#define nVisible 230                        // Прозрачность
+#define nVisible 230                        // РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ
 
 #define button1_id 1
 #define button2_id 2
@@ -49,23 +49,23 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     wc.hInstance = hInst;
     
     if (!RegisterClassEx(&wc)) {
-        MessageBox(NULL, L"Не получилось зарегистрировать класс!", L"Ошибка", MB_OK);
+        MessageBox(NULL, L"РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РєР»Р°СЃСЃ!", L"РћС€РёР±РєР°", MB_OK);
         return NULL; 
     }
 
-    hwnd = CreateWindowEx(WS_EX_LAYERED, L"Window", L"Опрос",
+    hwnd = CreateWindowEx(WS_EX_LAYERED, L"Window", L"РћРїСЂРѕСЃ",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL,
         CW_USEDEFAULT, NULL, 600, 300,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
     SetLayeredWindowAttributes(hwnd, 0, nVisible, LWA_ALPHA);
 
-    /*hwnd = CreateWindow(L"Window", L"Опрос",
+    /*hwnd = CreateWindow(L"Window", L"РћРїСЂРѕСЃ",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL, 
         CW_USEDEFAULT, NULL, 600, 300,
         (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
     
     if (!hwnd) {
-        MessageBox(NULL, L"Не получилось создать окно!", L"Ошибка", MB_OK);
+        MessageBox(NULL, L"РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РѕРєРЅРѕ!", L"РћС€РёР±РєР°", MB_OK);
         return NULL;
     }*/
 
@@ -79,13 +79,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
    
-    button1 = CreateWindow( L"BUTTON", L"Да",
+    button1 = CreateWindow( L"BUTTON", L"Р”Р°",
         WS_CHILD | WS_VISIBLE,
         masButtonPos[0] - 200, masButtonPos[1], 100, 50,
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
     SendMessage(button1, WM_SETFONT, (WPARAM)hFontButton, 0);
 
-    caption1 = CreateWindow(L"STATIC", L"Ты идиот?", //Ты не сможешь выбрать \"Нет\"
+    caption1 = CreateWindow(L"STATIC", L"РўС‹ РёРґРёРѕС‚?", //РўС‹ РЅРµ СЃРјРѕР¶РµС€СЊ РІС‹Р±СЂР°С‚СЊ \"РќРµС‚\"
         WS_CHILD | WS_VISIBLE | ES_CENTER | SS_CENTERIMAGE,
         10, 10, 563, 130,
         hwnd, (HMENU)caption1_id, hThisInstance, NULL);
@@ -97,7 +97,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
     //SendMessage(hwnd, WM_CTLCOLORSTATIC, (WPARAM)caption1, 0);
     SendMessage(caption1, WM_CTLCOLORSTATIC, (WPARAM)caption1, (LPARAM)GetDlgItem(hwnd, caption1_id));
 
-    button2 = CreateWindow(L"BUTTON", L"Нет",
+    button2 = CreateWindow(L"BUTTON", L"РќРµС‚",
         WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
         masButtonPos[0], masButtonPos[1], 100, 50,
         hwnd, (HMENU)button2_id, hThisInstance, NULL);
@@ -160,8 +160,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             SendMessage(button2, WM_CLOSE, 0, 0);
             DestroyWindow(button2);
             UpdateWindow(hwnd);
-            SetWindowTextA(caption1, "Справедливо, теперь можно и выйти");
-            button3 = CreateWindow(L"BUTTON", L"Выход",
+            SetWindowTextA(caption1, "РЎРїСЂР°РІРµРґР»РёРІРѕ, С‚РµРїРµСЂСЊ РјРѕР¶РЅРѕ Рё РІС‹Р№С‚Рё");
+            button3 = CreateWindow(L"BUTTON", L"Р’С‹С…РѕРґ",
                 WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
                 250, 150, 100, 50,
                 hwnd, (HMENU)button3_id, hThisInstance, NULL);
