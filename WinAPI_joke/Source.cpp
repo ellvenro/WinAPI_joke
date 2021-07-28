@@ -1,7 +1,7 @@
 ﻿#include <windows.h> 
 #include <math.h>
 
-#define captionOld "Ты идиот?"
+#define captionOld "Ты не сможешь выбрать \"Нет\"" //"Ты идиот?"
 #define captionNew "Справедливо, теперь можно и выйти"
 
 #define speedButton 50                      // Скорость кнопки
@@ -32,10 +32,9 @@ HFONT hFontCaption;
 RECT rct;
 HINSTANCE hThisInstance;
 
-int masButtonPos[] = { 350, 150 };
+int masButtonPos[][2] = { {350, 170}, { 150, 170}, { 250, 170} }; 
 
 BOOL MoveButton(int xPos, int yPos);
-void changeMas();
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
@@ -62,24 +61,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         return NULL; 
     }
 
-    //changeMas();
-
     hwnd = CreateWindowEx(WS_EX_LAYERED, L"Window", L"Опрос",
         WS_OVERLAPPEDWINDOW | WS_VSCROLL,
         CW_USEDEFAULT, NULL, sizeWindowW, sizeWindowH,
         (HWND)NULL, (HMENU)window_id, HINSTANCE(hInst), NULL);
     SetLayeredWindowAttributes(hwnd, 0, nVisible, LWA_ALPHA);
-
-    /*hwnd = CreateWindow(L"Window", L"Опрос",
-        WS_OVERLAPPEDWINDOW | WS_VSCROLL, 
-        CW_USEDEFAULT, NULL, 600, 300,
-        (HWND)NULL, NULL, HINSTANCE(hInst), NULL);
-    
-    if (!hwnd) {
-        MessageBox(NULL, L"Не получилось создать окно!", L"Ошибка", MB_OK);
-        return NULL;
-    }*/
-
     ShowScrollBar(hwnd, SB_BOTH, false);
 
     hFontButton = CreateFont(20, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
@@ -92,36 +78,30 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
    
     button1 = CreateWindow( L"BUTTON", L"Да",
         WS_CHILD | WS_VISIBLE,
-        masButtonPos[0] - 200, masButtonPos[1], sizeButtonW, sizeButtonH,
+        masButtonPos[1][0], masButtonPos[1][1], sizeButtonW, sizeButtonH,
         hwnd, (HMENU)button1_id, hThisInstance, NULL);
     SendMessage(button1, WM_SETFONT, (WPARAM)hFontButton, 0);
 
-    caption1 = CreateWindow(L"STATIC", L" ", //Ты не сможешь выбрать \"Нет\"
+    caption1 = CreateWindow(L"STATIC", L" ", 
         WS_CHILD | WS_VISIBLE | ES_CENTER | SS_CENTERIMAGE,
-        10, 10, 563, 130,
+        10, 10, sizeWindowW - 20 - 17, sizeWindowH / 2 - 10, //563, 130
         hwnd, (HMENU)caption1_id, hThisInstance, NULL);
     SendMessage(caption1, WM_SETFONT, (WPARAM)hFontCaption, 0);
-    //SetWindowTextA(caption1, "Ты идиот?");
-    //SetClassLong(caption1, GCLP_HBRBACKGROUND, coloreBackground);
-    
-    //SetTextColor(GetDC(caption1), coloreText);
-    //SetBkColor(GetDC(caption1), coloreBackground);
-    //UpdateWindow(caption1);
-    //CreateSolidBrush(RGB(0, 0, 0));
-    //SendMessage(hwnd, WM_CTLCOLORSTATIC, (WPARAM)caption1, 0);
-    //SendMessage(caption1, WM_CTLCOLORSTATIC, (WPARAM)caption1, (LPARAM)GetDlgItem(hwnd, caption1_id));
+    SetWindowTextA(caption1, captionOld);
 
     button2 = CreateWindow(L"BUTTON", L"Нет",
         WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
-        masButtonPos[0], masButtonPos[1], sizeButtonW, sizeButtonH,
+        masButtonPos[0][0], masButtonPos[0][1], sizeButtonW, sizeButtonH,
         hwnd, (HMENU)button2_id, hThisInstance, NULL);
     SendMessage(button2, WM_SETFONT, (WPARAM)hFontButton, TRUE);
    
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
-    SetWindowTextA(caption1, captionOld);
+    //SetWindowTextA(caption1, captionOld);
+    
     BOOL changeButton;
     LPPOINT pPnt = (LPPOINT)malloc(sizeof(*pPnt));
+    
     while (GetMessage(&msg, NULL, NULL, NULL)) 
     {
         GetCursorPos(pPnt);
@@ -129,12 +109,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         changeButton = MoveButton(pPnt[0].x, pPnt[0].y);
         if (changeButton)
         {
-            MoveWindow(button2, masButtonPos[0], masButtonPos[1], sizeButtonW, sizeButtonH, TRUE);
+            MoveWindow(button2, masButtonPos[0][0], masButtonPos[0][1], sizeButtonW, sizeButtonH, TRUE);
         }
        
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
     free(pPnt);
     return msg.wParam;
 }
@@ -168,7 +149,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     case WM_PAINT:
         UpdateWindow(hWnd);
-      
         break;
 
     case WM_SIZE:
@@ -186,15 +166,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             SetWindowTextA(caption1, captionNew);
             button3 = CreateWindow(L"BUTTON", L"Выход",
                 WS_CHILD | WS_VISIBLE | WS_EX_TOPMOST,
-                250, 150, sizeButtonW, sizeButtonH,
+                masButtonPos[2][0], masButtonPos[2][1], sizeButtonW, sizeButtonH,
                 hwnd, (HMENU)button3_id, hThisInstance, NULL);
             SendMessage(button3, WM_SETFONT, (WPARAM)hFontButton, TRUE);
         }
 
         if (wParam == button2_id)
         {
-            MoveButton(masButtonPos[0], masButtonPos[1]);
-            MoveWindow(button2, masButtonPos[0], masButtonPos[1], 100, 50, TRUE);
+            MoveButton(masButtonPos[0][0], masButtonPos[0][1]);
+            MoveWindow(button2, masButtonPos[0][0], masButtonPos[0][1], 100, 50, TRUE);
         }
 
         if (wParam == button3_id)
@@ -213,27 +193,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 BOOL MoveButton(int xPos, int yPos)
 {
     BOOL flag = FALSE;
-    int x = masButtonPos[0] + 50;
-    int y = masButtonPos[1] + 25;
+    int x = masButtonPos[0][0] + 50;
+    int y = masButtonPos[0][1] + 25;
 
     if (abs(xPos - x) <= 50 + hitButton && abs(yPos - y) <= 25 + hitButton)
     {
         int dx = x - xPos;
         int dy = y - yPos;
-        //float dxy = sqrt(dx * dx + dy * dy);
-        //int kdx = speedButton * abs(dx) % (int)dxy;
-        //int kdy = speedButton * abs(dy) % (int)dxy;
+        float dxy = sqrt(dx * dx + dy * dy);
+        int kdx = speedButton * abs(dx) / (int)dxy;
+        int kdy = speedButton * abs(dy) / (int)dxy;
 
-        //masButtonPos[0] = (dx <= 0) ? masButtonPos[0] - kdx : masButtonPos[0] + kdx;
-        //masButtonPos[1] = (dy <= 0) ? masButtonPos[1] - kdy : masButtonPos[1] + kdy;
+        masButtonPos[0][0] = (dx <= 0) ? masButtonPos[0][0] - kdx : masButtonPos[0][0] + kdx;
+        masButtonPos[0][1] = (dy <= 0) ? masButtonPos[0][1] - kdy : masButtonPos[0][1] + kdy;
 
-        masButtonPos[0] = masButtonPos[0] + dx;
-        masButtonPos[1] = masButtonPos[1] + dy;
+        //Упрощенный вариант без скорости
+        /*masButtonPos[0][0] = masButtonPos[0][0] + dx;
+        masButtonPos[0][1] = masButtonPos[0][1] + dy;*/
 
         flag = TRUE;
     }
 
-    if (masButtonPos[0] < 0 || masButtonPos[1] < 0 || masButtonPos[0] + 100 > rct.right || masButtonPos[1] + 50 > rct.bottom)
+    if (masButtonPos[0][0] < 0 || masButtonPos[0][1] < 0 || masButtonPos[0][0] + 100 > rct.right || masButtonPos[0][1] + 50 > rct.bottom)
     {
         float maxDistance = 0;
         int xSign = 1, ySign = 1;
@@ -254,16 +235,11 @@ BOOL MoveButton(int xPos, int yPos)
             xSign = -1;
         }
 
-        masButtonPos[0] = masButtonPos[0] + xSign * (dx / 2);
-        masButtonPos[1] = masButtonPos[1] + ySign * (dy / 2);
+        masButtonPos[0][0] = masButtonPos[0][0] + xSign * (dx / 2);
+        masButtonPos[0][1] = masButtonPos[0][1] + ySign * (dy / 2);
 
         flag = TRUE;
     }
         
     return flag;
-}
-
-void changeMas()
-{
-
 }
