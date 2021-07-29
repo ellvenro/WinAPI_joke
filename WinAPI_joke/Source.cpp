@@ -1,12 +1,12 @@
 ﻿#include <windows.h> 
 #include <math.h>
 
-#define captionOld "Ты не сможешь выбрать \"Нет\""
+#define captionOld "Ты не сможешь выбрать \"Нет\"" /*"Ты идиот?"*/
 #define captionNew "Справедливо, теперь можно и выйти"
 
 // Основные константные параметры
 #define speedButton 50                      // Скорость кнопки
-#define hitButton 10                        // Количество пикселей, на которое мышь может наезжать на кнопку
+#define hitButton -10                        // Количество пикселей, на которое мышь может наезжать на кнопку
 #define coloreBackground RGB(0, 0, 0)
 #define coloreText RGB(255, 255, 255)
 #define nVisible 230                        // Прозрачность
@@ -196,7 +196,7 @@ BOOL MoveButton(int xPos, int yPos)
     int x = masButtonPos[0][0] + 50;
     int y = masButtonPos[0][1] + 25;
 
-    if (abs(xPos - x) <= 50 + hitButton && abs(yPos - y) <= 25 + hitButton)
+    if (abs(xPos - x) <= 50 - hitButton && abs(yPos - y) <= 25 - hitButton)
     {
         int dx = x - xPos;
         int dy = y - yPos;
