@@ -1,13 +1,10 @@
 ﻿#include <windows.h> 
 #include <math.h>
 
-// Дополнительные задачи:
-//      * Согласовать размеры между всеми элементами
-//      * Изменить оформление объекта static
-
-#define captionOld "Ты не сможешь выбрать \"Нет\"" 
+#define captionOld "Ты не сможешь выбрать \"Нет\""
 #define captionNew "Справедливо, теперь можно и выйти"
 
+// Основные константные параметры
 #define speedButton 50                      // Скорость кнопки
 #define hitButton 10                        // Количество пикселей, на которое мышь может наезжать на кнопку
 #define coloreBackground RGB(0, 0, 0)
@@ -18,25 +15,29 @@
 #define sizeButtonW 100
 #define sizeButtonH 50
 
+// Идентификаторы элементов
 #define window_id 0
 #define button1_id 1
 #define button2_id 2
 #define button3_id 3
 #define caption1_id 4
 
+// Элементы окна
 HWND hwnd;
 HWND button1;
 HWND button2;
 HWND button3;
 HWND caption1;
 
+// Созданные шрифты для элементов окна
 HFONT hFontButton;
 HFONT hFontCaption;
 
 RECT rct;
 HINSTANCE hThisInstance;
 
-int masButtonPos[][2] = { {350, 170}, { 150, 170}, { 250, 170} }; 
+// Позиции левого верхнего угла трех кнопок в другом порядке (0 - button2, 1 - button1, 2 - button3)
+int masButtonPos[][2] = { {350, 180}, { 150, 180}, { 250, 180} }; 
 
 BOOL MoveButton(int xPos, int yPos);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -64,19 +65,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
         MessageBox(NULL, L"Не получилось зарегистрировать класс!", L"Ошибка", MB_OK);
         return NULL; 
     }
-
+    
     hwnd = CreateWindowEx(WS_EX_LAYERED, L"Window", L"Опрос",
-        WS_OVERLAPPEDWINDOW | WS_VSCROLL,
-        CW_USEDEFAULT, NULL, sizeWindowW, sizeWindowH,
+        WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX ,
+        400, 300, sizeWindowW, sizeWindowH,
         (HWND)NULL, (HMENU)window_id, HINSTANCE(hInst), NULL);
     SetLayeredWindowAttributes(hwnd, 0, nVisible, LWA_ALPHA);
-    ShowScrollBar(hwnd, SB_BOTH, false);
 
-    hFontButton = CreateFont(20, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
+    hFontButton = CreateFont(25, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
         DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
 
-    hFontCaption = CreateFont(30, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
+    hFontCaption = CreateFont(35, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE,
         DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, NULL);
    
@@ -88,7 +88,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
 
     caption1 = CreateWindow(L"STATIC", L" ", 
         WS_CHILD | WS_VISIBLE | ES_CENTER | SS_CENTERIMAGE,
-        10, 10, sizeWindowW - 20 - 17, sizeWindowH / 2 - 10, //563, 130
+        10, 10, sizeWindowW - 20 - 17, sizeWindowH / 2 - 10, 
         hwnd, (HMENU)caption1_id, hThisInstance, NULL);
     SendMessage(caption1, WM_SETFONT, (WPARAM)hFontCaption, 0);
     SetWindowTextA(caption1, captionOld);
@@ -101,7 +101,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
    
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
-    //SetWindowTextA(caption1, captionOld);
     
     BOOL changeButton;
     LPPOINT pPnt = (LPPOINT)malloc(sizeof(*pPnt));
@@ -133,11 +132,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         HDC hdcStatic = (HDC)wParam;
         SetTextColor(hdcStatic, coloreText);
-        //SetBkColor(hdcStatic, coloreText);
         SetBkMode((HDC)wParam, TRANSPARENT);
-        //return (INT_PTR)CreateSolidBrush(coloreBackground);
         return (INT_PTR)CreateSolidBrush(NULL_BRUSH);
-        //return (INT_PTR)CreateSolidBrush(WHITE_BRUSH);
     }
 
     case WM_CREATE:
@@ -210,10 +206,6 @@ BOOL MoveButton(int xPos, int yPos)
 
         masButtonPos[0][0] = (dx <= 0) ? masButtonPos[0][0] - kdx : masButtonPos[0][0] + kdx;
         masButtonPos[0][1] = (dy <= 0) ? masButtonPos[0][1] - kdy : masButtonPos[0][1] + kdy;
-
-        //Упрощенный вариант без скорости
-        /*masButtonPos[0][0] = masButtonPos[0][0] + dx;
-        masButtonPos[0][1] = masButtonPos[0][1] + dy;*/
 
         flag = TRUE;
     }
