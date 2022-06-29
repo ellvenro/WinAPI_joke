@@ -9,22 +9,18 @@
 Единственный вариант дальнейших действий - нажатие на кнопку "Да". Далее происходит смена текста и появление кнопки для выхода из программы.
 
 <p align="center">
-  <a href="https://wmpics.pics/pm-TCJW.html">
-    <img src="https://wmpics.pics/dm-TCJW.png"/>
+    <img src="https://drive.google.com/uc?export=view&id=1TfNvIla77OYIqKNbcYTwreQFdlHZjP9x" width="400"/>
   </a>
   &nbsp;&nbsp;&nbsp; 
-  <a href="https://wmpics.pics/pm-TCJW.html#image565493">
-    <img src="https://wmpics.pics/dm-C3XX.png"/>
+    <img src="https://drive.google.com/uc?export=view&id=1owShjcrezvNO4vsQF_Zali6KdajI6Dq8" width="400"/>
   </a>
 </p>
-  
+
 <p align="center">
-  <a href="https://wmpics.pics/pm-TCJW.html#image565494">
-    <img src="https://wmpics.pics/dm-5I5D.png"/>
+    <img src="https://drive.google.com/uc?export=view&id=14ZT8NrojTU6QWRYr8rfCJkSZUUxbiLnE" width="400"/>
   </a>
   &nbsp;&nbsp;&nbsp; 
-  <a href="https://wmpics.pics/pm-TCJW.html#image565495">
-    <img src="https://wmpics.pics/dm-1G47.png"/>
+    <img src="https://drive.google.com/uc?export=view&id=1F_23U--mPcm5Vw6HYsCd3d4qXsLXVkIv" width="400"/>
   </a>
 </p>
 
